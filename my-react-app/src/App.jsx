@@ -1,40 +1,65 @@
-import Header from './components/Header'
-import { IconA } from './components/icon'
-import Image from './components/image'
-import Checkbox from './components/Checkbox'
 import './App.css'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
-import { useState } from 'react'
+const API_URL = 'https://69df62c9d6de26e119294a16.mockapi.io/api/v1/todo/users';
 
 function App() {
-  const [todoList, setTodoList] = useState([
-    { id: 1, text: 'Learn React', isChecked: true },
-    { id: 2, text: 'Build a React App', isChecked: false },
-    { id: 3, text: 'Deploy the App', isChecked: false },
-  ]);
+  const [todos, setTodos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [count, setCount] = useState(0);
+  const fetchTodos = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setTodos(response.data);
+    } catch (error) {
+      console.error('Error fetching todos:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-  return (
-    <div className="App">
-      <Header />
-      
-      Hello Tada<br />
+  const deleteTodo = async (id) => {
+    try {
+      setIsLoading(true);
+      await axios.delete(`${API_URL}/${id}`);
+      setIsLoading(false);
+      fetchTodos();
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+      setIsLoading(false);
+    }
+  }
 
-      Now counter is {count} <br />
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-      <button onClick={() => setCount(count - 1)}>Decrement</button>
 
-      <IconA />
 
-      <Image src="https://picsum.photos/200" alt="Placeholder Image" />
-      {todoList.map((todo) => (
-        <Checkbox key={todo.id} Text={todo.text} isChecked={todo.isChecked} />
-      ))}
+  useEffect(() => {
+    fetchTodos();
+  }, []);
 
-    </div>
+  if (isLoading) {
 
-  )
+    return <p>Loading...</p>;
+
+  } else {
+
+    return (
+      <div>
+        <>
+          {todos.map((todo) => (
+            <div key={todo.id}>
+              <p>ชื่อ: {todo.name}</p>
+              <img src={todo.avatar} alt={todo.name} width="50" />
+
+              <Link to={`/Edit/${todo.id}`}><button>Edit</button></Link>
+              <button onClick={async () => await deleteTodo(todo.id)}>Delete</button>
+            </div>
+          ))}
+        </>
+      </div>
+    );
+  }
 }
 
 export default App
