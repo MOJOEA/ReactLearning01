@@ -7,8 +7,9 @@ const API_URL = 'https://69df62c9d6de26e119294a16.mockapi.io/api/v1/todo/users';
 
 function EditPage2() {
     const { id } = useParams();
+    
     const [todo, setTodo] = useState({ name: '' }); 
-    const [isLoading, setIsLoading] = useState(false); // 2. เพิ่ม State สำหรับ Loading
+    const [isLoading, setIsLoading] = useState(false);
 
     async function fetchTodo() {
         try {
